@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+// App.tsx
+import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
 import HomePage from './pages/HomePage';
 import ModulPage from './pages/ModulPage';
 import AlumniPage from './pages/AlumniPage';
@@ -9,9 +10,9 @@ import AngkatanPage from './pages/AngkatanPage';
 import SejarahPage from './pages/SejarahPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
-import { useAuth } from './hooks/useAuth';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -24,54 +25,31 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <Router>
+        <AppContent />
+      </Router>
     </QueryClientProvider>
   );
 }
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState('home');
   const { isAuthenticated, logout } = useAuth();
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <HomePage setCurrentPage={setCurrentPage} />;
-      case 'modul':
-        return <ModulPage />;
-      case 'alumni':
-        return <AlumniPage />;
-      case 'angkatan':
-        return <AngkatanPage />;
-      case 'sejarah':
-        return <SejarahPage />;
-      case 'contact':
-        return <ContactPage />;
-      case 'login':
-        return <LoginPage setCurrentPage={setCurrentPage} />;
-      default:
-        return <HomePage setCurrentPage={setCurrentPage} />;
-    }
-  };
-
-  // Special layout for login page - no header/footer
-  if (currentPage === 'login') {
-    return (
-      <div className="min-h-screen">
-        <LoginPage setCurrentPage={setCurrentPage} />
-      </div>
-    );
-  }
+  const [, setCurrentPage] = useState('home');
 
   return (
-    <div className="min-h-screen">
-      <Header 
-        currentPage={currentPage} 
-        setCurrentPage={setCurrentPage}
-        isLoggedIn={isAuthenticated}
-        onLogout={logout}
-      />
-      {renderPage()}
+    <div className="min-h-screen flex flex-col">
+      <Header isLoggedIn={isAuthenticated} onLogout={logout} />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/modul" element={<ModulPage />} />
+          <Route path="/alumni" element={<AlumniPage />} />
+          <Route path="/angkatan" element={<AngkatanPage />} />
+          <Route path="/sejarah" element={<SejarahPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </main>
       <Footer setCurrentPage={setCurrentPage} />
     </div>
   );

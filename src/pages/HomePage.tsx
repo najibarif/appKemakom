@@ -1,19 +1,18 @@
+// pages/HomePage.tsx
 import React from 'react';
 import Hero from '../components/Hero';
 import Features from '../components/Features';
 import LatestNews from '../components/LatestNews';
+import SejarahOrganisasi from '../components/SejarahOrganisasi';
 
-interface HomePageProps {
-  setCurrentPage: (page: string) => void;
-}
-
-const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
+const HomePage: React.FC = () => {
   return (
-    <>
-      <Hero setCurrentPage={setCurrentPage} />
-      <Features setCurrentPage={setCurrentPage} />
+    <div className="space-y-20">
+      <Hero />
+      <Features />
       <LatestNews />
-    </>
+      <SejarahOrganisasi />
+    </div>
   );
 };
 

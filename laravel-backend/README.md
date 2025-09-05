@@ -1,128 +1,61 @@
-# Laravel Backend API untuk BEM KEMAKOM
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-## Setup Laravel Backend
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-### 1. Install Laravel
-```bash
-composer create-project laravel/laravel laravel-backend
-cd laravel-backend
-```
+## About Laravel
 
-### 2. Install Dependencies
-```bash
-composer require laravel/sanctum
-composer require spatie/laravel-cors
-```
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-### 3. Setup Database
-Edit `.env` file:
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=bem_kemakom
-DB_USERNAME=root
-DB_PASSWORD=
-```
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-### 4. Run Migrations
-```bash
-php artisan migrate
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
-php artisan migrate
-```
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-### 5. Setup CORS
-Publish CORS config:
-```bash
-php artisan vendor:publish --tag="cors"
-```
+## Learning Laravel
 
-### 6. Generate API Routes
-```bash
-php artisan make:controller Api/AlumniController --api
-php artisan make:controller Api/AngkatanController --api
-php artisan make:controller Api/NewsController --api
-php artisan make:controller Api/ModulController --api
-php artisan make:controller Api/ContactController --api
-php artisan make:controller Api/TimelineController --api
-php artisan make:controller Api/AuthController
-```
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-### 7. Create Models
-```bash
-php artisan make:model Alumni -m
-php artisan make:model Angkatan -m
-php artisan make:model News -m
-php artisan make:model Modul -m
-php artisan make:model Contact -m
-php artisan make:model Timeline -m
-```
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-### 8. Run Server
-```bash
-php artisan serve
-```
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## API Endpoints
+## Laravel Sponsors
 
-### Authentication
-- POST `/api/auth/login` - Login
-- POST `/api/auth/logout` - Logout
-- GET `/api/auth/profile` - Get user profile
-- POST `/api/auth/refresh` - Refresh token
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-### Alumni
-- GET `/api/alumni` - Get all alumni
-- GET `/api/alumni/{id}` - Get alumni by ID
-- POST `/api/alumni` - Create alumni
-- PUT `/api/alumni/{id}` - Update alumni
-- DELETE `/api/alumni/{id}` - Delete alumni
+### Premium Partners
 
-### Angkatan
-- GET `/api/angkatan` - Get all angkatan
-- GET `/api/angkatan/{id}` - Get angkatan by ID
-- POST `/api/angkatan` - Create angkatan
-- PUT `/api/angkatan/{id}` - Update angkatan
-- DELETE `/api/angkatan/{id}` - Delete angkatan
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-### News
-- GET `/api/news` - Get all news
-- GET `/api/news/{id}` - Get news by ID
-- POST `/api/news` - Create news
-- PUT `/api/news/{id}` - Update news
-- DELETE `/api/news/{id}` - Delete news
-- POST `/api/news/{id}/view` - Increment views
+## Contributing
 
-### Moduls
-- GET `/api/moduls` - Get all moduls
-- GET `/api/moduls/{id}` - Get modul by ID
-- POST `/api/moduls` - Create modul
-- PUT `/api/moduls/{id}` - Update modul
-- DELETE `/api/moduls/{id}` - Delete modul
-- POST `/api/moduls/{id}/download` - Increment downloads
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-### Contacts
-- GET `/api/contacts` - Get all contacts
-- GET `/api/contacts/{id}` - Get contact by ID
-- POST `/api/contacts` - Create contact
-- PUT `/api/contacts/{id}` - Update contact
-- DELETE `/api/contacts/{id}` - Delete contact
+## Code of Conduct
 
-### Timeline
-- GET `/api/timeline` - Get all timeline
-- GET `/api/timeline/{id}` - Get timeline by ID
-- POST `/api/timeline` - Create timeline
-- PUT `/api/timeline/{id}` - Update timeline
-- DELETE `/api/timeline/{id}` - Delete timeline
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Database Schema
+## Security Vulnerabilities
 
-Lihat file migration di folder `database/migrations/` untuk struktur database lengkap.
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## Seeding Data
+## License
 
-Jalankan seeder untuk mengisi data awal:
-```bash
-php artisan db:seed
-```
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API base configuration
 export const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' 
+  baseURL: import.meta.env.PROD 
     ? 'https://your-laravel-api.com/api' 
     : import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   headers: {

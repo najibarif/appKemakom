@@ -1,5 +1,4 @@
-// components/Header.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { GraduationCap, Menu, X, User, LogOut } from 'lucide-react';
 
@@ -10,6 +9,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isLoggedIn = false, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -21,6 +21,15 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn = false, onLogout }) => {
     { path: '/sejarah', label: 'Sejarah' },
     { path: '/contact', label: 'Kontak' }
   ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     if (onLogout) {
@@ -38,39 +47,64 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn = false, onLogout }) => {
   };
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white/95 backdrop-blur-md shadow-soft' 
+        : 'bg-transparent'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Link to="/" className="text-xl font-bold text-green-600">
-                <GraduationCap className="h-8 w-8" />
-              </Link>
-            </div>
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-primary transform group-hover:scale-105 transition-transform duration-300">
+                <GraduationCap className="h-7 w-7 text-white" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className={`text-xl font-display font-bold transition-colors duration-300 ${
+                  isScrolled ? 'text-primary-dark' : 'text-white'
+                }`}>
+                  BEM KEMAKOM
+                </h1>
+                <p className={`text-sm transition-colors duration-300 ${
+                  isScrolled ? 'text-primary-600' : 'text-accent-yellow'
+                }`}>
+                  Universitas Gadjah Mada
+                </p>
+              </div>
+            </Link>
           </div>
           
-          <div className="hidden sm:flex sm:items-center sm:space-x-8 absolute left-1/2 transform -translate-x-1/2">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={handleNavClick}
-                className={`${
+                className={`relative px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 group ${
                   location.pathname === item.path
-                    ? 'border-green-500 text-green-700 border-b-[3px] pb-5'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 border-b-2'
-                } inline-flex items-center px-5 pt-5 pb-5 text-sm font-medium transition-colors duration-200`}
+                    ? isScrolled
+                      ? 'text-primary-dark bg-primary-50'
+                      : 'text-accent-yellow bg-white/10'
+                    : isScrolled
+                      ? 'text-gray-700 hover:text-primary-dark hover:bg-primary-50'
+                      : 'text-white/90 hover:text-accent-yellow hover:bg-white/10'
+                }`}
               >
                 {item.label}
+                {location.pathname === item.path && (
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary-light rounded-full"></div>
+                )}
               </Link>
             ))}
-          </div>
+          </nav>
 
-          <div className="hidden sm:flex sm:items-center">
+          {/* Auth Button */}
+          <div className="hidden lg:flex items-center">
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                className="inline-flex items-center px-6 py-3 bg-gradient-primary text-white font-medium rounded-xl hover:bg-gradient-primary-hover transform hover:scale-105 transition-all duration-300 shadow-primary"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -78,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn = false, onLogout }) => {
             ) : (
               <Link
                 to="/login"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                className="inline-flex items-center px-6 py-3 bg-gradient-primary text-white font-medium rounded-xl hover:bg-gradient-primary-hover transform hover:scale-105 transition-all duration-300 shadow-primary"
               >
                 <User className="h-4 w-4 mr-2" />
                 Login
@@ -86,50 +120,56 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn = false, onLogout }) => {
             )}
           </div>
 
-          <div className="-mr-2 flex items-center sm:hidden">
+          {/* Mobile Menu Button */}
+          <div className="lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className={`p-2 rounded-lg transition-colors duration-300 ${
+                isScrolled
+                  ? 'text-gray-700 hover:bg-primary-50'
+                  : 'text-white hover:bg-white/10'
+              }`}
             >
-              <span className="sr-only">Open main menu</span>
-              {isMenuOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
+        <div className="lg:hidden bg-white/95 backdrop-blur-md border-t border-gray-200/50">
+          <div className="px-4 py-6 space-y-4">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={handleNavClick}
-                className={`${
+                className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
                   location.pathname === item.path
-                    ? 'bg-green-50 border-green-500 text-green-700'
-                    : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                    ? 'text-white bg-gradient-primary shadow-primary'
+                    : 'text-gray-700 hover:text-primary-dark hover:bg-primary-50'
+                }`}
               >
                 {item.label}
               </Link>
             ))}
-            <div className="pt-4 pb-3 border-t border-gray-200">
+            <div className="pt-4 border-t border-gray-200">
               {isLoggedIn ? (
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+                  className="w-full flex items-center justify-center px-4 py-3 bg-gradient-primary text-white font-medium rounded-xl hover:bg-gradient-primary-hover transition-all duration-300 shadow-primary"
                 >
+                  <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </button>
               ) : (
                 <Link
                   to="/login"
                   onClick={handleNavClick}
-                  className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+                  className="w-full flex items-center justify-center px-4 py-3 bg-gradient-primary text-white font-medium rounded-xl hover:bg-gradient-primary-hover transition-all duration-300 shadow-primary"
                 >
+                  <User className="h-4 w-4 mr-2" />
                   Login
                 </Link>
               )}

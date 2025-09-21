@@ -1,6 +1,5 @@
-// components/LoginForm.tsx
 import React, { useState } from 'react';
-import { User, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, Loader2, Mail } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 interface LoginFormProps {
@@ -45,10 +44,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+    <div className="w-full max-w-md mx-auto">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="w-20 h-20 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-primary">
+          <User className="w-10 h-10 text-white" />
+        </div>
+        <h2 className="text-3xl font-display font-bold text-gray-900 mb-2">
+          Selamat Datang Kembali
+        </h2>
+        <p className="text-gray-600">
+          Masuk ke akun admin BEM KEMAKOM Anda
+        </p>
+      </div>
+
+      {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
-          <div className="flex">
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg">
+          <div className="flex items-center">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -61,12 +74,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         </div>
       )}
 
-      <div className="rounded-md shadow-sm -space-y-px">
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Email Field */}
         <div>
-          <label htmlFor="email" className="sr-only">Email address</label>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            Email Address
+          </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <User className="h-5 w-5 text-gray-400" />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Mail className="h-5 w-5 text-gray-400" />
             </div>
             <input
               id="email"
@@ -76,15 +93,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               required
               value={formData.email}
               onChange={handleInputChange}
-              className="appearance-none rounded-none relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-              placeholder="Email address"
+              className="block w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent transition-all duration-300 bg-white shadow-soft"
+              placeholder="admin@kemakom.ugm.ac.id"
             />
           </div>
         </div>
+
+        {/* Password Field */}
         <div>
-          <label htmlFor="password" className="sr-only">Password</label>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <Lock className="h-5 w-5 text-gray-400" />
             </div>
             <input
@@ -95,63 +116,73 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               required
               value={formData.password}
               onChange={handleInputChange}
-              className="appearance-none rounded-none relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
+              className="block w-full pl-12 pr-12 py-4 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent transition-all duration-300 bg-white shadow-soft"
+              placeholder="Masukkan password Anda"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              className="absolute inset-y-0 right-0 pr-4 flex items-center hover:text-primary-dark transition-colors duration-300"
             >
               {showPassword ? (
-                <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                <EyeOff className="h-5 w-5 text-gray-400" />
               ) : (
-                <Eye className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                <Eye className="h-5 w-5 text-gray-400" />
               )}
             </button>
           </div>
         </div>
-      </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <input
-            id="remember-me"
-            name="remember-me"
-            type="checkbox"
-            className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-          />
-          <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-            Remember me
-          </label>
+        {/* Remember Me & Forgot Password */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              className="h-4 w-4 text-primary-light focus:ring-primary-light border-gray-300 rounded"
+            />
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+              Ingat saya
+            </label>
+          </div>
+
+          <div className="text-sm">
+            <a href="#" className="font-medium text-primary-dark hover:text-primary-light transition-colors duration-300">
+              Lupa password?
+            </a>
+          </div>
         </div>
 
-        <div className="text-sm">
-          <a href="#" className="font-medium text-green-600 hover:text-green-500">
-            Forgot your password?
-          </a>
-        </div>
-      </div>
-
-      <div>
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={isLoading}
-          className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
+          className={`w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl text-white font-semibold text-lg bg-gradient-primary hover:bg-gradient-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light transform hover:scale-105 transition-all duration-300 shadow-primary ${
             isLoading ? 'opacity-75 cursor-not-allowed' : ''
           }`}
         >
           {isLoading ? (
-            <span className="flex items-center">
-              <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
-              Signing in...
-            </span>
+            <>
+              <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+              Masuk...
+            </>
           ) : (
-            'Sign in'
+            'Masuk ke Dashboard'
           )}
         </button>
+      </form>
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-sm text-gray-600">
+          Belum punya akses admin?{' '}
+          <a href="#" className="font-medium text-primary-dark hover:text-primary-light transition-colors duration-300">
+            Hubungi administrator
+          </a>
+        </p>
       </div>
-    </form>
+    </div>
   );
 };
 

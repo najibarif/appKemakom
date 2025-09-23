@@ -31,7 +31,7 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
           <div className="animate-fade-in-up">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-8 leading-tight">
               Badan Eksekutif Mahasiswa
-              <span className="block text-accent-yellow mt-2">
+              <span className="block text-primary-light mt-2">
                 Keluarga Mahasiswa Komputer
               </span>
             </h1>
@@ -48,7 +48,7 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
           <div className="animate-fade-in-up flex flex-col sm:flex-row gap-6 justify-center mb-20" style={{ animationDelay: '0.4s' }}>
             <button 
               onClick={() => setCurrentPage && setCurrentPage('modul')}
-              className="group inline-flex items-center px-8 py-4 bg-white text-primary-dark font-semibold text-lg rounded-xl hover:bg-accent-yellow transform hover:scale-105 transition-all duration-300 shadow-strong hover:shadow-primary-lg"
+              className="group inline-flex items-center px-8 py-4 bg-white text-primary-dark font-semibold text-lg rounded-xl hover:bg-primary-light hover:text-white transform hover:scale-105 transition-all duration-300 shadow-strong hover:shadow-primary-lg"
             >
               Jelajahi Fitur
               <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />

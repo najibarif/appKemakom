@@ -107,16 +107,16 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn = false, onLogout }) => {
                 className="inline-flex items-center px-6 py-3 bg-gradient-primary text-white font-medium rounded-xl hover:bg-gradient-primary-hover transform hover:scale-105 transition-all duration-300 shadow-primary"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </button>
+                   ? 'text-primary-dark bg-green-50'
+                   : 'text-primary-light bg-white/10'
             ) : (
               <Link
-                to="/login"
+                   : 'text-white/90 hover:text-primary-light hover:bg-white/10'
                 className="inline-flex items-center px-6 py-3 bg-gradient-primary text-white font-medium rounded-xl hover:bg-gradient-primary-hover transform hover:scale-105 transition-all duration-300 shadow-primary"
               >
                 <User className="h-4 w-4 mr-2" />
                 Login
-              </Link>
+              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary-light rounded-full"></div>
             )}
           </div>
 

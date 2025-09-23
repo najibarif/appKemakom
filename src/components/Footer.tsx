@@ -54,7 +54,7 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
               </div>
               <div>
                 <h3 className="text-2xl font-display font-bold">BEM KEMAKOM</h3>
-                <p className="text-accent-yellow text-sm">Universitas Gadjah Mada</p>
+                <p className="text-primary-light text-sm">Universitas Gadjah Mada</p>
               </div>
             </div>
             
@@ -88,9 +88,9 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                 <li key={index}>
                   <button 
                     onClick={() => setCurrentPage(link.page)}
-                    className="text-white/90 hover:text-accent-yellow transition-colors duration-300 flex items-center group"
+                    className="text-white/90 hover:text-primary-light transition-colors duration-300 flex items-center group"
                   >
-                    <span className="w-2 h-2 bg-accent-yellow rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    <span className="w-2 h-2 bg-primary-light rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                     {link.label}
                   </button>
                 </li>
@@ -106,7 +106,7 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                 <li key={index}>
                   <a 
                     href={org.url}
-                    className="text-white/90 hover:text-accent-yellow transition-colors duration-300 flex items-center group"
+                    className="text-white/90 hover:text-primary-light transition-colors duration-300 flex items-center group"
                   >
                     <ExternalLink className="w-4 h-4 mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     {org.name}
@@ -143,7 +143,7 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                   placeholder="Email Anda"
                   className="flex-1 px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-accent-yellow backdrop-blur-sm"
                 />
-                <button className="px-4 py-2 bg-accent-yellow text-primary-dark font-semibold rounded-lg hover:bg-white transition-colors duration-300">
+                <button className="px-4 py-2 bg-primary-light text-primary-dark font-semibold rounded-lg hover:bg-white transition-colors duration-300">
                   Subscribe
                 </button>
               </div>
@@ -158,9 +158,9 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
               &copy; 2025 BEM Keluarga Mahasiswa Komputer. All Rights Reserved.
             </p>
             <div className="flex items-center gap-6 text-sm text-white/80">
-              <a href="#" className="hover:text-accent-yellow transition-colors duration-300">Privacy Policy</a>
-              <a href="#" className="hover:text-accent-yellow transition-colors duration-300">Terms of Service</a>
-              <a href="#" className="hover:text-accent-yellow transition-colors duration-300">Sitemap</a>
+              <a href="#" className="hover:text-primary-light transition-colors duration-300">Privacy Policy</a>
+              <a href="#" className="hover:text-primary-light transition-colors duration-300">Terms of Service</a>
+              <a href="#" className="hover:text-primary-light transition-colors duration-300">Sitemap</a>
             </div>
           </div>
         </div>

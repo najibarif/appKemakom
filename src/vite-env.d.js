@@ -1,0 +1,1 @@
+// Vite environment types are handled automatically in JS projects

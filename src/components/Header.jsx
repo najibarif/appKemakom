@@ -31,7 +31,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
               <h1 className="text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors duration-300">
                 BEM KEMAKOM
               </h1>
-              <p className="text-sm text-gray-600">Universitas Gadjah Mada</p>
+              <p className="text-sm text-gray-600">Universitas Pendidikan Indonesia</p>
             </div>
           </Link>
 

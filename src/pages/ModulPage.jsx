@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ModulSidebar from '../components/ModulSidebar';
 import ModulContent from '../components/ModulContent';
 import Editor from '@monaco-editor/react';
-import { Code, RefreshCw } from 'lucide-react';
+import { Code, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ModulPage = () => {
   const [code, setCode] = useState(`
@@ -411,8 +411,8 @@ Di tab "Kode", Anda akan menemukan editor untuk mencoba menulis kode HTML. Berik
         <div className="mb-4 flex space-x-2">
           <button
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'content'
-                ? 'border-[#0F4639] text-[#0F4639] font-semibold'
-                : 'border-transparent text-gray-600 hover:text-[#0F4639] hover:bg-gradient-to-r hover:from-[#0F463910] hover:to-[#A6B93310]'
+              ? 'border-[#0F4639] text-[#0F4639] font-semibold'
+              : 'border-transparent text-gray-600 hover:text-[#0F4639] hover:bg-gradient-to-r hover:from-[#0F463910] hover:to-[#A6B93310]'
               }`}
             onClick={() => setActiveTab('content')}
           >
@@ -425,8 +425,8 @@ Di tab "Kode", Anda akan menemukan editor untuk mencoba menulis kode HTML. Berik
           </button>
           <button
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'code'
-                ? 'border-[#0F4639] text-[#0F4639] font-semibold'
-                : 'border-transparent text-gray-600 hover:text-[#0F4639] hover:bg-gradient-to-r hover:from-[#0F463910] hover:to-[#A6B93310]'
+              ? 'border-[#0F4639] text-[#0F4639] font-semibold'
+              : 'border-transparent text-gray-600 hover:text-[#0F4639] hover:bg-gradient-to-r hover:from-[#0F463910] hover:to-[#A6B93310]'
               }`}
             onClick={() => setActiveTab('code')}
           >
@@ -439,8 +439,8 @@ Di tab "Kode", Anda akan menemukan editor untuk mencoba menulis kode HTML. Berik
           </button>
           <button
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'quiz'
-                ? 'border-[#0F4639] text-[#0F4639] font-semibold'
-                : 'border-transparent text-gray-600 hover:text-[#0F4639] hover:bg-gradient-to-r hover:from-[#0F463910] hover:to-[#A6B93310]'
+              ? 'border-[#0F4639] text-[#0F4639] font-semibold'
+              : 'border-transparent text-gray-600 hover:text-[#0F4639] hover:bg-gradient-to-r hover:from-[#0F463910] hover:to-[#A6B93310]'
               }`}
             onClick={() => setActiveTab('quiz')}
           >
@@ -496,8 +496,8 @@ Di tab "Kode", Anda akan menemukan editor untuk mencoba menulis kode HTML. Berik
                                 <label
                                   key={optIndex}
                                   className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
-                                      ? 'border-[#0F4639] bg-gradient-to-r from-[#0F463910] to-[#A6B93310] shadow-sm'
-                                      : 'border-gray-200 hover:border-[#A6B933] hover:bg-gray-50'
+                                    ? 'border-[#0F4639] bg-gradient-to-r from-[#0F463910] to-[#A6B93310] shadow-sm'
+                                    : 'border-gray-200 hover:border-[#A6B933] hover:bg-gray-50'
                                     } ${isCorrect ? '!border-green-500 bg-green-50' : ''
                                     } ${isIncorrect ? '!border-red-500 bg-red-50' : ''
                                     }`}
@@ -536,8 +536,8 @@ Di tab "Kode", Anda akan menemukan editor untuk mencoba menulis kode HTML. Berik
 
                           {showAnswers && question.explanation && (
                             <div className={`mt-4 p-4 text-sm rounded-lg ${selectedAnswers[index] === question.correctAnswer
-                                ? 'bg-green-50 text-green-700 border border-green-100'
-                                : 'bg-red-50 text-red-700 border border-red-100'
+                              ? 'bg-green-50 text-green-700 border border-green-100'
+                              : 'bg-red-50 text-red-700 border border-red-100'
                               }`}>
                               <p className="font-semibold flex items-center">
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -570,8 +570,8 @@ Di tab "Kode", Anda akan menemukan editor untuk mencoba menulis kode HTML. Berik
                       onClick={checkAnswers}
                       disabled={Object.keys(selectedAnswers).length < currentModule.quiz.length}
                       className={`px-6 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] ${Object.keys(selectedAnswers).length < currentModule.quiz.length
-                          ? 'bg-gray-300 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-[#0F4639] to-[#A6B933] hover:from-[#0F4639]/90 hover:to-[#A6B933]/90 focus:ring-[#0F4639] shadow-md hover:shadow-lg'
+                        ? 'bg-gray-300 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-[#0F4639] to-[#A6B933] hover:from-[#0F4639]/90 hover:to-[#A6B933]/90 focus:ring-[#0F4639] shadow-md hover:shadow-lg'
                         }`}
                     >
                       Periksa Jawaban
@@ -597,8 +597,8 @@ Di tab "Kode", Anda akan menemukan editor untuk mencoba menulis kode HTML. Berik
 
                 {showAnswers && (
                   <div className={`mt-6 p-6 rounded-xl shadow-sm ${score >= 70
-                      ? 'bg-gradient-to-r from-green-50 to-green-100 border border-green-100'
-                      : 'bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-100'
+                    ? 'bg-gradient-to-r from-green-50 to-green-100 border border-green-100'
+                    : 'bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-100'
                     }`}>
                     <div className="flex items-start">
                       <div className="flex-shrink-0">
@@ -712,27 +712,23 @@ Di tab "Kode", Anda akan menemukan editor untuk mencoba menulis kode HTML. Berik
                 </div>
               </div>
             </div>
+            <div className="flex justify-between items-center mt-6">
+              <button
+                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-5 h-5 mr-1" />
+                Sebelumnya
+              </button>
+
+              <button
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-[#0F4639] to-[#A6B933] border border-transparent rounded-lg shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0F4639] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Selanjutnya
+                <ChevronRight className="w-5 h-5 ml-1" />
+              </button>
+            </div>
           </div>
         )}
-
-        <div className="mt-6 flex justify-between">
-          <button
-            onClick={handlePrevious}
-            disabled={!hasPrevious}
-            className={`px-4 py-2 rounded ${hasPrevious ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-          >
-            Sebelumnya
-          </button>
-          <button
-            onClick={handleNext}
-            className={`px-4 py-2 rounded ${isLastModule
-                ? 'bg-green-500 hover:bg-green-600'
-                : 'bg-blue-500 hover:bg-blue-600'
-              } text-white`}
-          >
-            {isLastModule ? 'Selesai' : 'Selanjutnya'}
-          </button>
-        </div>
       </div>
     </div>
   );

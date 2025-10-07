@@ -7,7 +7,7 @@ import { angkatanService } from '../services/angkatanService';
 const Angkatan = () => {
   const { data: angkatanData, isLoading, error } = useQuery({
     queryKey: ['angkatan'],
-    queryFn: angkatanService.getAngkatan,
+    queryFn: angkatanService.getAll,
   });
 
   if (isLoading) {

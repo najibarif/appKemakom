@@ -6,7 +6,7 @@ import { newsService } from '../services/newsService';
 const LatestNews = () => {
   const { data: newsData, isLoading, error } = useQuery({
     queryKey: ['news'],
-    queryFn: newsService.getLatestNews,
+    queryFn: newsService.getAll,
   });
 
   if (isLoading) {

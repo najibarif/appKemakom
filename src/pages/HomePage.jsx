@@ -5,7 +5,7 @@ import SejarahOrganisasi from '../components/SejarahOrganisasi';
 
 const HomePage = () => {
   return (
-    <div className="space-y-20">
+    <div>
       <Hero />
       <Features />
       <LatestNews />

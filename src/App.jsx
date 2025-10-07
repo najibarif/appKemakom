@@ -32,7 +32,7 @@ const queryClient = new QueryClient({
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
-  const [activeItem, setActiveItem] = useState('home');
+  const [currentPage, setCurrentPage] = useState('home');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -65,8 +65,13 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="flex flex-col min-h-screen">
-          <Header isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-          <main className="flex-grow">
+          <Header 
+            isAuthenticated={isAuthenticated} 
+            onLogout={handleLogout} 
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
+          <main className="flex-grow pt-20">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/modul" element={<ModulPage />} />
@@ -95,7 +100,7 @@ function App() {
               />
             </Routes>
           </main>
-          <Footer />
+          <Footer setCurrentPage={setCurrentPage} />
         </div>
       </Router>
     </QueryClientProvider>

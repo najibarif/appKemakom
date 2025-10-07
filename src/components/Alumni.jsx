@@ -6,8 +6,9 @@ import { alumniService } from '../services/alumniService';
 const Alumni = () => {
   const { data: alumniData, isLoading, error } = useQuery({
     queryKey: ['alumni'],
-    queryFn: alumniService.getAlumni,
+    queryFn: alumniService.getAll, // ← ubah dari getAlumni ke getAll
   });
+  
 
   if (isLoading) {
     return (

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Calendar, Users, Award, Building } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { timelineService } from '../services/timelineService';
@@ -57,7 +56,7 @@ const SejarahOrganisasi = () => {
         </div>
 
         <div className="relative">
-          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-green-200"></div>
+          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-[#0F4639]/30 to-[#A6B933]/30"></div>
           
           <div className="space-y-12">
             {timelineData?.map((item, index) => {
@@ -67,20 +66,20 @@ const SejarahOrganisasi = () => {
               return (
                 <div key={index} className={`flex items-center ${isEven ? 'flex-row' : 'flex-row-reverse'}`}>
                   <div className={`w-1/2 ${isEven ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
-                    <div className="bg-gray-50 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                       <div className={`flex items-center gap-3 mb-3 ${isEven ? 'justify-end' : 'justify-start'}`}>
-                        <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-green-700 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#0F4639] to-[#A6B933] rounded-full flex items-center justify-center">
                           <Icon className="w-5 h-5 text-white" />
                         </div>
-                        <span className="text-2xl font-bold text-green-600">{item.year}</span>
+                        <span className="text-2xl font-bold bg-gradient-to-r from-[#0F4639] to-[#A6B933] bg-clip-text text-transparent">{item.year}</span>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                      <h3 className="text-xl font-bold text-gray-800 mb-2">{item.title}</h3>
                       <p className="text-gray-600 leading-relaxed">{item.description}</p>
                     </div>
                   </div>
                   
                   <div className="relative z-10">
-                    <div className="w-4 h-4 bg-green-600 rounded-full border-4 border-white shadow-lg"></div>
+                    <div className="w-5 h-5 bg-gradient-to-br from-[#0F4639] to-[#A6B933] rounded-full border-4 border-white shadow-lg"></div>
                   </div>
                   
                   <div className="w-1/2"></div>
@@ -91,8 +90,8 @@ const SejarahOrganisasi = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-8 rounded-xl">
-            <h3 className="text-2xl font-bold mb-4">#Juara #SinarhAksi</h3>
+          <div className="bg-gradient-to-br from-[#0F4639] to-[#A6B933] text-white p-8 rounded-xl">
+            <h3 className="text-2xl font-bold mb-4">#KemakomJuara #TumbuhAsa</h3>
             <p className="text-green-100 text-lg">
               Motto KEMAKOM yang menginspirasi setiap generasi untuk berprestasi dan berkontribusi
             </p>
@@ -102,7 +101,5 @@ const SejarahOrganisasi = () => {
     </section>
   );
 };
-
-SejarahOrganisasi.propTypes = {};
 
 export default SejarahOrganisasi;

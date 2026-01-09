@@ -1,8 +1,9 @@
 import React from 'react';
 import { BookOpen, GraduationCap, History, ArrowRight, Users, Award, Calendar } from 'lucide-react';
-import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
-const Features = ({ setCurrentPage }) => {
+const Features = () => {
+  const navigate = useNavigate();
   const features = [
     {
       icon: BookOpen,
@@ -20,9 +21,9 @@ const Features = ({ setCurrentPage }) => {
     },
     {
       icon: History,
-      title: "Sejarah Organisasi",
-      description: "Sejarah dan rekam jejak BEM, DPM, dan UKK dari masa ke masa yang menginspirasi generasi mendatang",
-      page: "sejarah",
+      title: "Kinerja Organisasi",
+      description: "Rekam jejak BEM, DPM, dan UKK dari masa ke masa yang menginspirasi generasi mendatang",
+      page: "kinerja",
       stats: "40+ Tahun"
     }
   ];
@@ -86,7 +87,7 @@ const Features = ({ setCurrentPage }) => {
 
                 {/* CTA Button */}
                 <button 
-                  onClick={() => setCurrentPage && setCurrentPage(feature.page)}
+                  onClick={() => navigate(`/${feature.page}`)}
                   className="group/btn inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#0F4639] to-[#A6B933] text-white font-semibold rounded-xl hover:opacity-90 transform hover:scale-105 transition-all duration-300 shadow-md"
                 >
                   Jelajahi
@@ -108,32 +109,23 @@ const Features = ({ setCurrentPage }) => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {achievements.map((achievement, index) => {
-              const Icon = achievement.icon;
-              return (
-                <div key={index} className="text-center group">
-                  <div className="w-20 h-20 bg-gradient-to-r from-[#0F4639] to-[#A6B933] rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300 shadow-md">
-                    <Icon className="w-10 h-10 text-white" />
-                  </div>
-                  <div className="text-4xl font-display font-bold text-[#0F4639] mb-2">
-                    {achievement.value}
-                  </div>
-                  <div className="text-gray-600 font-medium">
-                    {achievement.label}
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {achievements.map((achievement, index) => (
+              <div key={index} className="bg-white rounded-2xl p-6 shadow-md flex items-center gap-4 hover:shadow-lg transition-shadow duration-300">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#0F4639] to-[#A6B933] rounded-xl flex items-center justify-center">
+                  <achievement.icon className="w-6 h-6 text-white" />
                 </div>
-              );
-            })}
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">{achievement.value}</div>
+                  <div className="text-gray-600">{achievement.label}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-Features.propTypes = {
-  setCurrentPage: PropTypes.func
 };
 
 export default Features;

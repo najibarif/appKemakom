@@ -1,61 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { User, Camera, Save, Award, BookOpen, TrendingUp, Clock, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { moduleProgressService } from '../services/moduleProgressService';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { learningModuleService } from '../services/learningModuleService';
 
 const UserProfilePage = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
+    profile_image: null,
+    created_at: null,
+    last_login: null,
+    role: 'user'
+  });
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [imageKey, setImageKey] = useState(0); // Key untuk force re-render image
+    const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  
+  // State for modules and progress
+  const [modules, setModules] = useState([]);
+  const [completedModules, setCompletedModules] = useState([]);
+  const [moduleScores, setModuleScores] = useState({});
+  const [profileData, setProfileData] = useState(null);
 
-  // Fetch user profile
-  const { data: profileData, refetch: refetchProfile } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: async () => {
-      try {
-        const data = await authService.getProfile();
-        return data;
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-    },
-    enabled: authService.isAuthenticated(),
-  });
-
-  // Fetch module progress
-  const { data: progressData } = useQuery({
-    queryKey: ['moduleProgress'],
-    queryFn: async () => {
-      try {
-        const data = await moduleProgressService.getProgress();
-        return data;
-      } catch (error) {
-        console.error('Error fetching progress:', error);
-        return null;
-      }
-    },
-    enabled: authService.isAuthenticated(),
-  });
-
+  // Load user profile and modules data
   useEffect(() => {
-    if (profileData) {
-      setUser(profileData);
-      // If user has profile image, set it
-      if (profileData.profile_image) {
-        setPreviewImage(profileData.profile_image);
-      } else {
-        setPreviewImage(null);
+    let isMounted = true;
+
+    const loadData = async () => {
+      try {
+        // Load user profile
+        const profile = await authService.getProfile();
+        if (!isMounted) return;
+        
+        setProfileData(profile);
+        setUser(profile);
+        
+        if (profile.profile_image) {
+          setPreviewImage(profile.profile_image);
+        }
+
+        // Load modules and progress in parallel
+        const [modulesData, progress] = await Promise.all([
+          learningModuleService.getAll(),
+          moduleProgressService.getProgress()
+        ]);
+
+        if (!isMounted) return;
+
+        setModules(modulesData || []);
+        setCompletedModules(progress?.completed_modules || []);
+        setModuleScores(progress?.module_scores || {});
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
+    };
+
+    if (authService.isAuthenticated()) {
+      loadData();
     }
-  }, [profileData]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Memoize progress calculations
+  const { totalModules, completedCount, progressPercentage } = useMemo(() => {
+    const total = modules.length;
+    const completed = completedModules.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { totalModules: total, completedCount: completed, progressPercentage: percentage };
+  }, [modules, completedModules]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -75,33 +99,23 @@ const UserProfilePage = () => {
       return;
     }
     
-    console.log('Uploading profile image:', {
-      name: profileImage.name,
-      size: profileImage.size,
-      type: profileImage.type
-    });
-    
     setSaving(true);
     try {
       const response = await authService.updateProfile({
         profile_image: profileImage
       });
       
-      console.log('Profile update response:', response); // Debug log
-      
       // Update local state immediately
-      if (response && response.user) {
+      if (response?.user) {
         const updatedUser = response.user;
         setUser(updatedUser);
         
         // Update preview image with cache busting
         if (updatedUser.profile_image) {
-          // Add timestamp to URL to force browser to reload image
           const separator = updatedUser.profile_image.includes('?') ? '&' : '?';
           const imageUrl = `${updatedUser.profile_image}${separator}t=${Date.now()}`;
-          console.log('Setting preview image to:', imageUrl); // Debug log
           setPreviewImage(imageUrl);
-          setImageKey(prev => prev + 1); // Force re-render image
+          setImageKey(prev => prev + 1);
         } else {
           setPreviewImage(null);
         }
@@ -112,18 +126,15 @@ const UserProfilePage = () => {
       }
       
       // Refetch profile data to ensure consistency
-      const refetchedData = await refetchProfile();
-      if (refetchedData?.data) {
-        setUser(refetchedData.data);
-        if (refetchedData.data.profile_image) {
-          const separator = refetchedData.data.profile_image.includes('?') ? '&' : '?';
-          setPreviewImage(`${refetchedData.data.profile_image}${separator}t=${Date.now()}`);
-          setImageKey(prev => prev + 1);
-        }
-      }
+      const profile = await authService.getProfile();
+      setProfileData(profile);
+      setUser(profile);
       
-      // Invalidate queries to refresh data everywhere
-      await queryClient.invalidateQueries(['userProfile']);
+      if (profile.profile_image) {
+        const separator = profile.profile_image.includes('?') ? '&' : '?';
+        setPreviewImage(`${profile.profile_image}${separator}t=${Date.now()}`);
+        setImageKey(prev => prev + 1);
+      }
       
       // Show success message
       alert('Foto profil berhasil diupdate!');
@@ -136,9 +147,6 @@ const UserProfilePage = () => {
     }
   };
 
-  const totalModules = 8;
-  const completedModules = progressData?.completed_modules?.length || 0;
-  const progressPercentage = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gray-50 pt-24 pb-12">
@@ -272,19 +280,10 @@ const UserProfilePage = () => {
               {/* Module List */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-gray-900 mb-3">Detail Modul</h4>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((moduleId) => {
-                  const isCompleted = progressData?.completed_modules?.includes(moduleId) || false;
-                  const score = progressData?.module_scores?.[moduleId] || null;
-                  const moduleTitles = {
-                    1: 'Pengenalan HTML',
-                    2: 'Struktur Dasar HTML',
-                    3: 'HTML Tags dan Attributes',
-                    4: 'CSS Dasar',
-                    5: 'CSS Selectors',
-                    6: 'CSS Layout',
-                    7: 'JavaScript Dasar',
-                    8: 'DOM Manipulasi',
-                  };
+                {modules.map((module) => {
+                  const moduleId = module.id;
+                  const isCompleted = completedModules.includes(moduleId);
+                  const score = moduleScores[moduleId] || null;
 
                   return (
                     <div
@@ -303,7 +302,7 @@ const UserProfilePage = () => {
                         )}
                         <div>
                           <p className="font-medium text-gray-900">Modul {moduleId}</p>
-                          <p className="text-sm text-gray-600">{moduleTitles[moduleId]}</p>
+                          <p className="text-sm text-gray-600">{module.title}</p>
                         </div>
                       </div>
                       <div className="text-right">

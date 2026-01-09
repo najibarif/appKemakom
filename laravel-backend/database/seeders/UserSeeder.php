@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             ['email' => 'admin@kemakom.org'],
             [
                 'name' => 'Admin KEMAKOM',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Password@123'),
                 'email_verified_at' => now(),
             ]
         );

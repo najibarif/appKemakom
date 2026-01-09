@@ -1,21 +1,56 @@
 import React from 'react';
 import { GraduationCap, Briefcase, MapPin, Calendar } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { alumniService } from '../services/alumniService';
 
 const Alumni = () => {
+  const queryClient = useQueryClient();
   const { data: alumniData, isLoading, error } = useQuery({
     queryKey: ['alumni'],
     queryFn: alumniService.getAll,
+    initialData: () => {
+      // prefer react-query cache, then sessionStorage fallback
+      const cached = queryClient.getQueryData(['alumni']);
+      if (cached) return cached;
+      const pref = sessionStorage.getItem('prefetched_alumni');
+      try {
+        return pref ? JSON.parse(pref) : undefined;
+      } catch (e) {
+        return undefined;
+      }
+    }
   });
 
   if (isLoading) {
+    // Non-blocking skeleton grid for perceived faster load
     return (
       <section id="alumni" className="py-24 bg-white relative overflow-hidden">
-        <div className="container mx-auto px-6">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-[#0F4639] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <p className="text-gray-600 text-lg">Memuat data alumni...</p>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#0F4639] to-[#A6B933] text-white rounded-full text-sm font-medium mb-6 shadow-md">
+              <GraduationCap className="w-4 h-4 mr-2" />
+              Database Alumni
+            </div>
+            <div className="h-8 w-2/5 bg-gray-200 rounded-md mx-auto animate-pulse"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="group bg-white rounded-2xl shadow-md p-8 animate-pulse">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 bg-gray-200 rounded-xl" />
+                  <div className="flex-1">
+                    <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
+                    <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  <div className="h-4 bg-gray-200 rounded w-5/6" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
 
   const handleLoginSuccess = () => {
@@ -21,7 +21,7 @@ const LoginPage = () => {
       {/* Content */}
       <div className="relative z-10 w-full max-w-md">
         <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-strong p-8">
-          <LoginForm onLoginSuccess={handleLoginSuccess} />
+          <LoginForm onLogin={onLogin} onLoginSuccess={handleLoginSuccess} />
         </div>
       </div>
     </div>

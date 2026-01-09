@@ -2,6 +2,11 @@ import React from 'react';
 import { GraduationCap, Menu, X, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { learningModuleService } from '../services/learningModuleService';
+import { alumniService } from '../services/alumniService';
+import { angkatanService } from '../services/angkatanService';
+import { timelineService } from '../services/timelineService';
 
 const Header = ({ isAuthenticated, onLogout, userProfile }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,7 +18,7 @@ const Header = ({ isAuthenticated, onLogout, userProfile }) => {
     { name: 'Modul', href: '/modul' },
     { name: 'Alumni', href: '/alumni' },
     { name: 'Angkatan', href: '/angkatan' },
-    { name: 'Sejarah', href: '/sejarah' },
+    { name: 'Kinerja', href: '/kinerja' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -37,19 +42,84 @@ const Header = ({ isAuthenticated, onLogout, userProfile }) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-1">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  isActive(item.href)
-                    ? 'bg-gradient-to-r from-[#0F4639]/20 to-[#A6B933]/20 text-[#0F4639] font-semibold border-b-2 border-[#0F4639]'
-                    : 'text-gray-600 hover:bg-gradient-to-r hover:from-[#0F4639]/5 hover:to-[#A6B933]/5 hover:text-gray-800'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {(() => {
+              const queryClient = useQueryClient();
+
+              const prefetchers = {
+                '/modul': async () => {
+                  try {
+                    await queryClient.prefetchQuery(['modules'], learningModuleService.getAll);
+                    const data = await learningModuleService.getAll();
+                    if (Array.isArray(data)) sessionStorage.setItem('prefetched_modules', JSON.stringify(data));
+                  } catch (e) {}
+                },
+                '/alumni': async () => {
+                  try {
+                    await queryClient.prefetchQuery(['alumni'], alumniService.getAll);
+                    const data = await alumniService.getAll();
+                    if (Array.isArray(data)) sessionStorage.setItem('prefetched_alumni', JSON.stringify(data));
+                  } catch (e) {}
+                },
+                '/angkatan': async () => {
+                  try {
+                    await queryClient.prefetchQuery(['angkatan'], angkatanService.getAll);
+                    const data = await angkatanService.getAll();
+                    if (Array.isArray(data)) sessionStorage.setItem('prefetched_angkatan', JSON.stringify(data));
+                  } catch (e) {}
+                },
+                '/kinerja': async () => {
+                  try {
+                    await queryClient.prefetchQuery(['timeline'], timelineService.getAll);
+                    const data = await timelineService.getAll();
+                    if (Array.isArray(data)) sessionStorage.setItem('prefetched_timeline', JSON.stringify(data));
+                  } catch (e) {}
+                }
+              };
+
+              return navigation.map((item) => {
+                const prefetch = prefetchers[item.href];
+
+                if (prefetch) {
+                  const handleClick = (e) => {
+                    e.preventDefault();
+                    // Trigger prefetch in background but don't await it — avoid blocking navigation
+                    prefetch().catch(() => {});
+                    navigate(item.href);
+                  };
+
+                  return (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      onMouseEnter={prefetch}
+                      onFocus={prefetch}
+                      onClick={handleClick}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                        isActive(item.href)
+                          ? 'bg-gradient-to-r from-[#0F4639]/20 to-[#A6B933]/20 text-[#0F4639] font-semibold border-b-2 border-[#0F4639]'
+                          : 'text-gray-600 hover:bg-gradient-to-r hover:from-[#0F4639]/5 hover:to-[#A6B933]/5 hover:text-gray-800'
+                      }`}
+                    >
+                      {item.name}
+                    </a>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                      isActive(item.href)
+                        ? 'bg-gradient-to-r from-[#0F4639]/20 to-[#A6B933]/20 text-[#0F4639] font-semibold border-b-2 border-[#0F4639]'
+                        : 'text-gray-600 hover:bg-gradient-to-r hover:from-[#0F4639]/5 hover:to-[#A6B933]/5 hover:text-gray-800'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              });
+            })()}
           </nav>
 
           {/* Auth Section */}

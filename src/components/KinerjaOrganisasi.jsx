@@ -1,12 +1,23 @@
 import React from 'react';
 import { Calendar, Users, Award, Building, History } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { timelineService } from '../services/timelineService';
 
-const SejarahOrganisasi = () => {
+const KinerjaOrganisasi = () => {
+  const queryClient = useQueryClient();
   const { data: timelineData, isLoading, error } = useQuery({
     queryKey: ['timeline'],
     queryFn: timelineService.getAll,
+    initialData: () => {
+      const cached = queryClient.getQueryData(['timeline']);
+      if (cached) return cached;
+      const pref = sessionStorage.getItem('prefetched_timeline');
+      try {
+        return pref ? JSON.parse(pref) : undefined;
+      } catch (e) {
+        return undefined;
+      }
+    }
   });
 
   // Map icon names to components
@@ -21,12 +32,36 @@ const SejarahOrganisasi = () => {
   };
 
   if (isLoading) {
+    // Non-blocking skeleton timeline
     return (
-      <section id="sejarah" className="py-24 bg-white relative overflow-hidden">
-        <div className="container mx-auto px-6">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-[#0F4639] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <p className="text-gray-600 text-lg">Memuat sejarah organisasi...</p>
+      <section id="kinerja" className="py-24 bg-white relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#0F4639] to-[#A6B933] text-white rounded-full text-sm font-medium mb-6 shadow-md">
+              <History className="w-4 h-4 mr-2" />
+              Kinerja Organisasi
+            </div>
+            <div className="h-8 w-1/3 bg-gray-200 rounded-md mx-auto animate-pulse"></div>
+          </div>
+
+          <div className="relative max-w-5xl mx-auto">
+            <div className="space-y-12">
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <div key={idx} className="flex items-center animate-pulse">
+                  <div className="w-full md:w-1/2 md:pr-8 md:text-right">
+                    <div className="bg-white rounded-2xl p-6 shadow-sm">
+                      <div className="h-6 bg-gray-200 rounded w-1/3 mb-4 ml-auto"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 ml-auto mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-2/3 ml-auto"></div>
+                    </div>
+                  </div>
+                  <div className="hidden md:block relative z-10">
+                    <div className="w-6 h-6 bg-gray-200 rounded-full border-4 border-white shadow-lg mx-6"></div>
+                  </div>
+                  <div className="hidden md:block w-1/2" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -35,13 +70,13 @@ const SejarahOrganisasi = () => {
 
   if (error) {
     return (
-      <section id="sejarah" className="py-24 bg-white relative overflow-hidden">
+      <section id="kinerja" className="py-24 bg-white relative overflow-hidden">
         <div className="container mx-auto px-6">
           <div className="text-center">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-red-500 text-2xl">!</span>
             </div>
-            <p className="text-red-600 text-lg">Gagal memuat sejarah organisasi</p>
+            <p className="text-red-600 text-lg">Gagal memuat kinerja organisasi</p>
           </div>
         </div>
       </section>
@@ -49,7 +84,7 @@ const SejarahOrganisasi = () => {
   }
 
   return (
-    <section id="sejarah" className="py-24 bg-white relative overflow-hidden">
+    <section id="kinerja" className="py-24 bg-white relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#0F4639] to-[#A6B933] rounded-full blur-3xl opacity-5"></div>
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-br from-[#0F4639] to-[#A6B933] rounded-full blur-3xl opacity-5"></div>
@@ -59,7 +94,7 @@ const SejarahOrganisasi = () => {
         <div className="text-center mb-20 animate-fade-in-up">
           <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#0F4639] to-[#A6B933] text-white rounded-full text-sm font-medium mb-6 shadow-md">
             <History className="w-4 h-4 mr-2" />
-            Sejarah Organisasi
+            Kinerja Organisasi
           </div>
           <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-6">
             Rekam Jejak
@@ -68,7 +103,7 @@ const SejarahOrganisasi = () => {
             </span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Sejarah dan rekam jejak BEM, DPM, dan UKK dari masa ke masa yang menginspirasi generasi mendatang
+            Rekam jejak BEM, DPM, dan UKK dari masa ke masa yang menginspirasi generasi mendatang
           </p>
         </div>
 
@@ -119,9 +154,6 @@ const SejarahOrganisasi = () => {
         <div className="mt-20 text-center animate-fade-in-up">
           <div className="bg-gradient-to-r from-[#0F4639] to-[#A6B933] text-white p-12 rounded-3xl shadow-xl">
             <h3 className="text-3xl font-display font-bold mb-4">#KemakomJuara #TumbuhAsa</h3>
-            <p className="text-white/90 text-lg leading-relaxed max-w-2xl mx-auto">
-              Motto KEMAKOM yang menginspirasi setiap generasi untuk berprestasi dan berkontribusi
-            </p>
           </div>
         </div>
       </div>
@@ -129,4 +161,4 @@ const SejarahOrganisasi = () => {
   );
 };
 
-export default SejarahOrganisasi;
+export default KinerjaOrganisasi;

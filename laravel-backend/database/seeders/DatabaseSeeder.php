@@ -10,6 +10,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
+        // Run dedicated seeders for users and learning modules
+        $this->call([
+            UserSeeder::class,
+            LearningModuleSeeder::class,
+        ]);
+
         // Seed Alumni Table
         for ($i = 1; $i <= 20; $i++) {
             DB::table('alumni')->insert([
@@ -40,58 +46,9 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Seed News Table
-        for ($i = 1; $i <= 15; $i++) {
-            DB::table('news')->insert([
-                'title' => 'News Title ' . $i,
-                'content' => 'This is a detailed news content about ' . Str::random(15) . '. ' . 
-                            'It includes various information and updates about our department.',
-                'image' => 'news_image_' . $i . '.jpg',
-                'date' => now()->subDays($i * 5)->format('Y-m-d'),
-                'views' => rand(50, 1000),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        // Seed Moduls Table
-        $categories = ['Pemrograman', 'Jaringan', 'Basis Data', 'AI', 'Keamanan'];
-        for ($i = 1; $i <= 20; $i++) {
-            DB::table('moduls')->insert([
-                'title' => 'Modul ' . $categories[$i % 5] . ' ' . $i,
-                'description' => 'Modul pembelajaran tentang ' . $categories[$i % 5] . ' untuk mahasiswa angkatan ' . (2020 + ($i % 5)),
-                'category' => $categories[$i % 5],
-                'downloads' => rand(50, 500),
-                'views' => rand(100, 1000),
-                'date' => now()->subDays($i * 3)->format('Y-m-d'),
-                'file' => 'modul_' . Str::slug($categories[$i % 5]) . '_' . $i . '.pdf',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        // Seed Contacts Table
-        $contacts = [
-            ['type' => 'email', 'title' => 'Email', 'info' => 'info@kemakom.com'],
-            ['type' => 'phone', 'title' => 'Phone', 'info' => '+62 1234 5678'],
-            ['type' => 'address', 'title' => 'Alamat', 'info' => 'Jl. Raya Janti No.143, Karang Jambe, Banguntapan, Bantul, Yogyakarta 55198'],
-            ['type' => 'facebook', 'title' => 'Facebook', 'info' => 'facebook.com/kemakom'],
-            ['type' => 'instagram', 'title' => 'Instagram', 'info' => '@kemakom_ugm'],
-        ];
-
-        foreach ($contacts as $contact) {
-            DB::table('contacts')->insert([
-                'type' => $contact['type'],
-                'title' => $contact['title'],
-                'info' => $contact['info'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
         // Seed Timeline Table
         $events = [
-            ['year' => '1985', 'title' => 'Pendirian Program Studi', 'description' => 'Pendirian Program Studi Ilmu Komputer UGM', 'icon' => 'building'],
+            ['year' => '1985', 'title' => 'Pendirian Program Studi', 'description' => 'Pendirian Program Studi Pendidikan Ilmu Komputer dan Ilmu Komputer UPI', 'icon' => 'building'],
             ['year' => '1990', 'title' => 'Akreditasi Pertama', 'description' => 'Mendapatkan akreditasi pertama dari BAN-PT', 'icon' => 'award'],
             ['year' => '2000', 'title' => 'Pembangunan Gedung Baru', 'description' => 'Pembangunan gedung baru untuk menampung mahasiswa yang semakin bertambah', 'icon' => 'building'],
             ['year' => '2010', 'title' => 'Kerjasama Internasional', 'description' => 'Penandatanganan kerjasama dengan universitas di luar negeri', 'icon' => 'users'],

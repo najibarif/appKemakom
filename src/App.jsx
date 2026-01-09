@@ -7,8 +7,7 @@ import HomePage from './pages/HomePage';
 import ModulPage from './pages/ModulPage';
 import AlumniPage from './pages/AlumniPage';
 import AngkatanPage from './pages/AngkatanPage';
-import SejarahPage from './pages/SejarahPage';
-import ContactPage from './pages/ContactPage';
+import KinerjaPage from './pages/KinerjaPage';
 import LoginPage from './pages/LoginPage';
 import UserProfilePage from './pages/UserProfilePage';
 import Header from './components/Header';
@@ -107,7 +106,7 @@ function App() {
           <main className="flex-grow pt-20">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/contact" element={<ContactPage />} />
+              {/* /contact route removed */}
               <Route 
                 path="/modul" 
                 element={
@@ -133,10 +132,10 @@ function App() {
                 } 
               />
               <Route 
-                path="/sejarah" 
+                path="/kinerja" 
                 element={
                   <ProtectedRoute>
-                    <SejarahPage />
+                    <KinerjaPage />
                   </ProtectedRoute>
                 } 
               />

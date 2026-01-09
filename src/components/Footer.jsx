@@ -8,8 +8,7 @@ const Footer = ({ setCurrentPage }) => {
     { label: 'Modul Pembelajaran', page: 'modul' },
     { label: 'Database Alumni', page: 'alumni' },
     { label: 'Data Angkatan', page: 'angkatan' },
-    { label: 'Sejarah Organisasi', page: 'sejarah' },
-    { label: 'Kontak', page: 'contact' }
+    { label: 'Kinerja Organisasi', page: 'kinerja' }
   ];
 
   const organizations = [
@@ -28,7 +27,7 @@ const Footer = ({ setCurrentPage }) => {
   ];
 
   const contactInfo = [
-    { icon: Mail, text: 'info@kemakom.upi.edu' },
+    { icon: Mail, text: 'admin@kemakom.org' },
     { icon: Phone, text: '+62 222 123 456' },
     { icon: MapPin, text: 'Jl. Dr. Setiabudi No. 229, Bandung 40154' }
   ];

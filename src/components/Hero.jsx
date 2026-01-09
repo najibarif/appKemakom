@@ -22,7 +22,6 @@ const Hero = ({ setCurrentPage }) => {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col justify-center items-center h-full max-w-5xl text-center transform">
-
         {/* Heading */}
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-snug bg-gradient-to-r from-[#ffffff] to-[#fbf5af] bg-clip-text text-transparent">
           Badan Eksekutif Mahasiswa
@@ -31,28 +30,9 @@ const Hero = ({ setCurrentPage }) => {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-base md:text-lg text-white/90 mb-6 leading-relaxed max-w-2xl">
-          Mewujudkan mahasiswa komputer yang unggul, berdedikasi, dan bermanfaat bagi masyarakat melalui inovasi teknologi dan kepemimpinan yang berkelanjutan
+        <p className="text-base md:text-lg text-white/90 mb-20 leading-relaxed max-w-2xl">
+          Mewujudkan BEM KEMAKOM menjadi organisasi yang harmonis dan bisa bermanfaat bagi seluruh warga.
         </p>
-
-        {/* CTA */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center my-8">
-          <button
-            onClick={() => setCurrentPage && setCurrentPage('modul')}
-            className="group inline-flex items-center px-5 py-3 bg-white text-[#0F4639] font-semibold text-base rounded-xl hover:bg-[#A6B933] hover:text-white transform hover:scale-105 transition-all duration-300"
-          >
-            Jelajahi Fitur
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-          </button>
-
-          <button
-            onClick={() => setCurrentPage && setCurrentPage('sejarah')}
-            className="group inline-flex items-center px-5 py-3 border-2 border-white text-white font-semibold text-base rounded-xl hover:bg-white hover:text-[#0F4639] transform hover:scale-105 transition-all duration-300"
-          >
-            <Play className="mr-2 h-4 w-4" />
-            Tentang Kami
-          </button>
-        </div>
       </div>
     </section >
   );

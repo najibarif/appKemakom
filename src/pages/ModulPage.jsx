@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ModulSidebar from '../components/ModulSidebar';
 import ModulContent from '../components/ModulContent';
 import Editor from '@monaco-editor/react';
@@ -7,6 +8,7 @@ import { moduleProgressService } from '../services/moduleProgressService';
 import { learningModuleService } from '../services/learningModuleService';
 
 const ModulPage = () => {
+  const queryClient = useQueryClient();
   const [code, setCode] = useState('');
   const iframeRef = useRef(null);
   const [currentModuleId, setCurrentModuleId] = useState(1);
@@ -16,76 +18,98 @@ const ModulPage = () => {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showAnswers, setShowAnswers] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [modulesData, setModulesData] = useState(null); // Data from API (null = not loaded, [] = loaded but empty)
   const [modules, setModules] = useState([]); // Transformed modules with locked/completed state
   const [moduleContent, setModuleContent] = useState({}); // Module content from API
 
-  // Load modules from API - only once on mount
-  useEffect(() => {
-    let isMounted = true;
-    
-    const loadModules = async () => {
-      try {
-        const data = await learningModuleService.getAll();
-        
-        if (!isMounted) return; // Prevent state update if component unmounted
-        
-        setModulesData(data);
-        
-        // If no modules found, set loading to false anyway
-        if (data.length === 0) {
-          setLoading(false);
+  // Use React Query to fetch modules
+  const { data: modulesData = [], isLoading } = useQuery({
+    queryKey: ['modules'],
+    queryFn: learningModuleService.getAll,
+    initialData: () => {
+      // Try to get data from react-query cache first
+      const cached = queryClient.getQueryData(['modules']);
+      if (cached) return cached;
+      // Fall back to sessionStorage if available
+      const pref = sessionStorage.getItem('prefetched_modules');
+      if (pref) {
+        sessionStorage.removeItem('prefetched_modules'); // Clean up after reading
+        try {
+          return JSON.parse(pref);
+        } catch (e) {
+          return [];
         }
-      } catch (error) {
-        console.error('Error loading modules:', error);
-        if (!isMounted) return;
-        // Fallback to empty state
-        setModulesData([]); // Empty array means loaded but no data
-        setLoading(false); // Set loading to false even on error
       }
-    };
-    
-    loadModules();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []); // Empty dependency array - only fetch once
+      return undefined;
+    },
+  });
 
   // Memoize transformation of modulesData to avoid recalculation
   const { modulesList, contentMap } = useMemo(() => {
-    if (!modulesData || modulesData.length === 0) {
+    console.log('Transforming modules data...');
+    console.log('modulesData:', modulesData);
+    console.log('completedModules:', completedModules);
+    
+    if (!Array.isArray(modulesData) || modulesData.length === 0) {
+      console.log('No modules data available');
       return { modulesList: [], contentMap: {} };
     }
     
     const contentMap = {};
     const modulesList = modulesData.map((module, index) => {
-      contentMap[module.id] = {
-        id: module.id,
-        title: module.title,
+      if (!module || typeof module !== 'object') {
+        console.warn('Invalid module data at index', index, ':', module);
+        return null;
+      }
+      
+      // Ensure required fields exist
+      const moduleData = {
+        id: module.id || index + 1,
+        title: module.title || `Modul ${index + 1}`,
         description: module.description || '',
         content: module.content || '',
         simulation_code: module.simulation_code || '',
-        quiz: module.quiz || [],
-      };
-      
-      return {
-        id: module.id,
-        title: module.title,
-        completed: false,
-        locked: index > 0, // First module unlocked, others locked
+        quiz: Array.isArray(module.quiz) ? module.quiz : [],
         duration: module.duration || '0 min',
       };
-    });
+      
+      contentMap[moduleData.id] = moduleData;
+      
+      // A module is completed if it's in the completedModules array
+      const isCompleted = Array.isArray(completedModules) && 
+                         completedModules.includes(moduleData.id);
+      
+      // A module is unlocked if it's the first one, or the previous one is completed
+      const isLocked = index > 0 && 
+                      (!Array.isArray(completedModules) || 
+                       !completedModules.includes(modulesData[index - 1]?.id));
+      
+      return {
+        id: moduleData.id,
+        title: moduleData.title,
+        completed: isCompleted,
+        locked: isLocked,
+        duration: moduleData.duration,
+      };
+    }).filter(Boolean); // Remove any null entries from invalid modules
+    
+    console.log('Transformed modules list:', modulesList);
+    console.log('Content map:', contentMap);
     
     return { modulesList, contentMap };
-  }, [modulesData]);
+  }, [modulesData, completedModules]);
 
   // Update modules and moduleContent when transformation changes
   useEffect(() => {
     setModules(modulesList);
     setModuleContent(contentMap);
+
+    // Ensure currentModuleId points to a valid module once modules are available
+    if (modulesList && modulesList.length > 0) {
+      const hasCurrent = contentMap && contentMap[currentModuleId];
+      if (!hasCurrent) {
+        setCurrentModuleId(modulesList[0].id);
+      }
+    }
   }, [modulesList, contentMap]);
 
   // Calculate module states
@@ -171,125 +195,169 @@ const ModulPage = () => {
 
   // Load progress from backend on mount (after modules are loaded)
   useEffect(() => {
-    // If modulesData is null, modules haven't been loaded yet - wait
-    if (modulesData === null) {
-      return; // Wait for modules to load
-    }
-    
-    // If modulesData is empty array (loaded but no data), set loading to false
-    if (modulesData.length === 0 && modules.length === 0) {
+    // If no modules data yet, wait
+    if (!modulesData || !Array.isArray(modulesData) || modulesData.length === 0) {
+      console.log('No modules data available');
       setLoading(false);
       return;
-    }
-    
-    // If no modules loaded yet, wait
-    if (modules.length === 0) {
-      return; // Wait for modules to load
     }
     
     const loadProgress = async () => {
       try {
         setLoading(true);
-        const progress = await moduleProgressService.getProgress();
+        console.log('Loading progress from server...');
         
-        // Check if user has any progress (completed modules or saved current module)
-        const hasProgress = (progress.completed_modules && progress.completed_modules.length > 0) || 
-                           (progress.current_module_id && progress.current_module_id > 1) ||
-                           (progress.module_scores && Object.keys(progress.module_scores).length > 0);
+        // Load progress with retry logic
+        let progress;
+        let retryCount = 0;
+        const maxRetries = 3;
         
-        if (hasProgress) {
-          // User has existing progress
-          if (progress.completed_modules) {
-            setCompletedModules(progress.completed_modules);
+        while (retryCount < maxRetries) {
+          try {
+            progress = await moduleProgressService.getProgress();
+            console.log('Progress loaded:', progress);
+            break; // Exit loop if successful
+          } catch (error) {
+            retryCount++;
+            console.warn(`Attempt ${retryCount} failed to load progress:`, error);
+            if (retryCount === maxRetries) throw error;
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
           }
-          if (progress.module_scores) {
-            setModuleScores(progress.module_scores);
-          }
-          // Set current module ID only if it exists in loaded modules
-          const validModuleId = modules.find(m => m.id === progress.current_module_id) 
+        }
+        
+        // Ensure progress has the expected structure
+        if (!progress || typeof progress !== 'object') {
+          console.log('No or invalid progress data found, initializing...');
+          progress = {
+            completed_modules: [],
+            module_scores: {},
+            current_module_id: 1,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        
+        // Ensure required fields exist with proper types
+        const safeProgress = {
+          completed_modules: Array.isArray(progress.completed_modules) 
+            ? [...new Set(progress.completed_modules)].filter(id => typeof id === 'number') 
+            : [],
+          module_scores: typeof progress.module_scores === 'object' && progress.module_scores !== null 
+            ? progress.module_scores 
+            : {},
+          current_module_id: typeof progress.current_module_id === 'number' 
             ? progress.current_module_id 
-            : modules[0]?.id || 1;
-          setCurrentModuleId(validModuleId);
+            : 1,
+          updatedAt: progress.updatedAt || new Date().toISOString()
+        };
+        
+        console.log('Processed progress data:', safeProgress);
+        
+        // Update state with progress data
+        setCompletedModules([...safeProgress.completed_modules]);
+        setModuleScores({...safeProgress.module_scores});
+        
+        // Set current module ID, defaulting to first module if invalid
+        const validModuleId = modules.find(m => m.id === safeProgress.current_module_id) 
+          ? safeProgress.current_module_id 
+          : (modules[0]?.id || 1);
           
-          // Update modules state based on progress
-          setModules(prevModules => {
-            return prevModules.map((module, index) => {
-              const isCompleted = progress.completed_modules?.includes(module.id) || false;
-              // First module is always unlocked
-              if (index === 0) {
-                return { ...module, completed: isCompleted, locked: false };
-              }
-              // Other modules: unlocked if previous module is completed
-              const prevModule = prevModules[index - 1];
-              const isLocked = !prevModule?.completed;
-              
-              return {
-                ...module,
-                completed: isCompleted,
-                locked: isLocked,
-              };
-            });
-          });
-        } else {
-          // New user - start from first module
-          const firstModuleId = modules[0]?.id || 1;
-          setCurrentModuleId(firstModuleId);
-          setCompletedModules([]);
-          setModuleScores({});
-          
-          // Initialize modules: only first module is unlocked
-          setModules(prevModules => {
-            return prevModules.map((module, index) => {
-              if (index === 0) {
-                return { ...module, completed: false, locked: false };
-              }
-              return { ...module, completed: false, locked: true };
-            });
-          });
+        console.log('Setting current module ID:', validModuleId);
+        setCurrentModuleId(validModuleId);
+        
+        // Update modules state based on progress
+        setModules(prevModules => 
+          prevModules.map((module, index) => {
+            const isCompleted = safeProgress.completed_modules.includes(module.id);
+            const isLocked = index > 0 && !safeProgress.completed_modules.includes(prevModules[index - 1]?.id);
+            
+            return {
+              ...module,
+              completed: isCompleted,
+              locked: isLocked,
+            };
+          })
+        );
+        
+        // Initialize new user state if no progress found
+        if (safeProgress.completed_modules.length === 0 && Object.keys(safeProgress.module_scores).length === 0) {
+          console.log('Initializing new user progress...');
+          // First module is always unlocked for new users
+          setModules(prevModules => 
+            prevModules.map((module, index) => ({
+              ...module,
+              completed: false,
+              locked: index !== 0
+            }))
+          );
         }
       } catch (error) {
         console.error('Error loading progress:', error);
-        // On error, default to first module for new user
-        const firstModuleId = modules[0]?.id || 1;
-        setCurrentModuleId(firstModuleId);
+        
+        // Initialize with default values on error
         setCompletedModules([]);
         setModuleScores({});
-        setModules(prevModules => {
-          return prevModules.map((module, index) => {
-            if (index === 0) {
-              return { ...module, completed: false, locked: false };
-            }
-            return { ...module, completed: false, locked: true };
-          });
-        });
+        
+        // Set first module as active and unlocked
+        const firstModuleId = modules[0]?.id || 1;
+        setCurrentModuleId(firstModuleId);
+        
+        // Initialize all modules (first one unlocked, others locked)
+        setModules(prevModules => 
+          prevModules.map((module, index) => ({
+            ...module,
+            completed: false,
+            locked: index !== 0
+          }))
+        );
       } finally {
         setLoading(false);
       }
     };
     
     loadProgress();
-  }, [modules.length]);
+  }, [modules.length, modulesData]);
 
-  // Save progress to backend whenever it changes
+  // Periodically sync progress with server
   useEffect(() => {
-    const saveProgress = async () => {
-      if (loading) return; // Don't save on initial load
-      
+    if (loading || !modulesData) return;
+
+    const syncProgress = async () => {
       try {
-        await moduleProgressService.updateProgress({
-          completed_modules: completedModules,
-          module_scores: moduleScores,
-          current_module_id: currentModuleId,
-        });
+        console.log('Synchronizing progress with server...');
+        const progress = await moduleProgressService.getProgress();
+        
+        if (progress) {
+          // Only update if the server has newer data
+          const localLastUpdated = new Date(Math.max(
+            ...completedModules.map(id => {
+              const module = modules.find(m => m.id === id);
+              return module?.updatedAt ? new Date(module.updatedAt).getTime() : 0;
+            })
+          ));
+          
+          const serverLastUpdated = progress.updatedAt ? new Date(progress.updatedAt) : new Date(0);
+          
+          if (serverLastUpdated > localLastUpdated) {
+            console.log('Updating local progress from server');
+            setCompletedModules(progress.completed_modules || []);
+            setModuleScores(progress.module_scores || {});
+            
+            if (progress.current_module_id) {
+              setCurrentModuleId(progress.current_module_id);
+            }
+          }
+        }
       } catch (error) {
-        console.error('Error saving progress:', error);
+        console.warn('Failed to sync progress:', error);
       }
     };
+
+    // Sync immediately and then every 30 seconds
+    syncProgress();
+    const syncInterval = setInterval(syncProgress, 30000);
     
-    // Debounce save to avoid too many API calls
-    const timeoutId = setTimeout(saveProgress, 500);
-    return () => clearTimeout(timeoutId);
-  }, [completedModules, moduleScores, currentModuleId, loading]);
+    return () => clearInterval(syncInterval);
+  }, [loading, modulesData, modules, completedModules]);
 
   // Reset quiz state when module changes
   useEffect(() => {
@@ -371,45 +439,74 @@ const ModulPage = () => {
     }
   };
 
-  const handleQuizComplete = (moduleId, score) => {
-    // Update the module score
-    setModuleScores(prevScores => ({
-      ...prevScores,
-      [moduleId]: score
-    }));
+  const handleQuizComplete = async (moduleId, score) => {
+    try {
+      // Update the module score in state
+      const newScores = {
+        ...moduleScores,
+        [moduleId]: score
+      };
+      setModuleScores(newScores);
 
-    // Save module score to backend
-    moduleProgressService.updateModuleProgress(moduleId, {
-      completed: score >= 70,
-      score: score
-    }).catch(error => {
-      console.error('Error saving module progress:', error);
-    });
+      // Determine if module should be marked as completed
+      const isPassingScore = score >= 70;
+      const isAlreadyCompleted = completedModules.includes(moduleId);
+      let newCompletedModules = [...completedModules];
+      
+      if (isPassingScore && !isAlreadyCompleted) {
+        newCompletedModules = [...completedModules, moduleId];
+        setCompletedModules(newCompletedModules);
+      }
 
-    // If score is passing (e.g., 70 or higher), mark as completed
-    if (score >= 70 && !completedModules.includes(moduleId)) {
-      const newCompletedModules = [...completedModules, moduleId];
-      setCompletedModules(newCompletedModules);
-
-      // Update modules state to mark as completed
+      // Update modules state to reflect completion and locking
       setModules(prevModules => {
-        const updatedModules = prevModules.map(module =>
-          module.id === moduleId
-            ? { ...module, completed: true }
-            : module
-        );
+        const updatedModules = prevModules.map(module => {
+          // Mark current module as completed if passing
+          if (module.id === moduleId) {
+            return { ...module, completed: isPassingScore };
+          }
+          return module;
+        });
 
-        // Unlock next module if not the last one
-        const currentModuleIndex = updatedModules.findIndex(m => m.id === moduleId);
-        if (currentModuleIndex < updatedModules.length - 1) {
-          return updatedModules.map((module, index) =>
-            index === currentModuleIndex + 1
-              ? { ...module, locked: false }
-              : module
-          );
+        // If passing score, unlock the next module
+        if (isPassingScore) {
+          const currentIndex = updatedModules.findIndex(m => m.id === moduleId);
+          if (currentIndex < updatedModules.length - 1) {
+            return updatedModules.map((module, index) => {
+              if (index === currentIndex + 1) {
+                return { ...module, locked: false };
+              }
+              return module;
+            });
+          }
         }
         return updatedModules;
       });
+
+      // Save progress to backend
+      try {
+        await moduleProgressService.updateModuleProgress(moduleId, {
+          completed: isPassingScore,
+          score: score
+        });
+        
+        // Also update the overall progress
+        await moduleProgressService.updateProgress({
+          completed_modules: newCompletedModules,
+          module_scores: newScores,
+          current_module_id: moduleId
+        });
+        
+        console.log('Progress saved successfully');
+      } catch (error) {
+        console.error('Error saving progress:', error);
+        // Revert the changes if the API call fails
+        if (isPassingScore && !isAlreadyCompleted) {
+          setCompletedModules(prev => prev.filter(id => id !== moduleId));
+        }
+      }
+    } catch (error) {
+      console.error('Error in handleQuizComplete:', error);
     }
   };
 
@@ -444,19 +541,36 @@ const ModulPage = () => {
       handleQuizComplete(currentModuleId, score);
     }
   };
-  if (loading) {
+  if (isLoading) {
+    // Non-blocking skeleton UI to improve perceived load time
     return (
-      <div className="flex h-screen bg-gray-50 items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#0F4639] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat progress modul...</p>
+      <div className="flex h-screen bg-gray-50">
+        <div className="w-72 p-6">
+          <div className="space-y-4">
+            <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div>
+            <div className="h-8 bg-gray-200 rounded-md animate-pulse"></div>
+            <div className="h-8 bg-gray-200 rounded-md animate-pulse"></div>
+            <div className="h-8 bg-gray-200 rounded-md animate-pulse"></div>
+            <div className="h-8 bg-gray-200 rounded-md animate-pulse"></div>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="space-y-6">
+            <div className="h-8 w-1/3 bg-gray-200 rounded-md animate-pulse"></div>
+            <div className="h-64 bg-white rounded-xl shadow-sm border border-gray-100 p-6 animate-pulse"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="h-48 bg-white rounded-xl shadow-sm border border-gray-100 p-6 animate-pulse"></div>
+              <div className="h-48 bg-white rounded-xl shadow-sm border border-gray-100 p-6 animate-pulse"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   // Show message if no modules found
-  if (modulesData !== null && modules.length === 0) {
+  if (!modulesData || modulesData.length === 0) {
     return (
       <div className="flex h-screen bg-gray-50 items-center justify-center">
         <div className="text-center max-w-md">

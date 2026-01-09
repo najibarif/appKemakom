@@ -1,21 +1,52 @@
 import React from 'react';
 import { Calendar, Users, Award } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { angkatanService } from '../services/angkatanService';
 
 const Angkatan = () => {
+  const queryClient = useQueryClient();
   const { data: angkatanData, isLoading, error } = useQuery({
     queryKey: ['angkatan'],
     queryFn: angkatanService.getAll,
+    initialData: () => {
+      const cached = queryClient.getQueryData(['angkatan']);
+      if (cached) return cached;
+      const pref = sessionStorage.getItem('prefetched_angkatan');
+      try {
+        return pref ? JSON.parse(pref) : undefined;
+      } catch (e) {
+        return undefined;
+      }
+    }
   });
 
   if (isLoading) {
+    // Non-blocking skeleton for angkatan
     return (
       <section id="angkatan" className="py-24 bg-gray-50 relative overflow-hidden">
-        <div className="container mx-auto px-6">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-[#0F4639] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <p className="text-gray-600 text-lg">Memuat data angkatan...</p>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#0F4639] to-[#A6B933] text-white rounded-full text-sm font-medium mb-6 shadow-md">
+              <Calendar className="w-4 h-4 mr-2" />
+              Data Angkatan
+            </div>
+            <div className="h-8 w-1/3 bg-gray-200 rounded-md mx-auto animate-pulse"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="group bg-white rounded-2xl shadow-md p-8 animate-pulse">
+                <div className="text-center mb-6">
+                  <div className="w-20 h-20 bg-gray-200 rounded-2xl mx-auto mb-4" />
+                  <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto mb-2" />
+                  <div className="h-4 bg-gray-200 rounded w-1/3 mx-auto" />
+                </div>
+                <div className="border-t border-gray-100 pt-6">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-3" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

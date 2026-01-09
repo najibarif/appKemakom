@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff, Loader2, Mail } from 'lucide-react';
 import { authService } from '../services/authService';
 
-const LoginForm = ({ onLoginSuccess }) => {
+const LoginForm = ({ onLogin, onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -25,9 +25,18 @@ const LoginForm = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      const response = await authService.login(formData);
-      authService.setToken(response.token);
-      onLoginSuccess?.(response.user);
+      if (onLogin) {
+        const result = await onLogin(formData);
+        if (result?.success) {
+          onLoginSuccess?.(result.user);
+        } else {
+          setError(result?.error || 'Login failed. Please try again.');
+        }
+      } else {
+        const response = await authService.login(formData);
+        authService.setToken(response.token);
+        onLoginSuccess?.(response.user);
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
@@ -150,17 +159,18 @@ const LoginForm = ({ onLoginSuccess }) => {
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl text-white font-semibold text-lg bg-gradient-primary hover:bg-gradient-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light transform hover:scale-105 transition-all duration-300 shadow-primary ${
+          className={`w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl text-white font-semibold text-lg bg-gradient-to-r from-[#0F4639] to-[#A6B933] hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0F4639] transform hover:scale-105 transition-all duration-300 shadow-md ${
             isLoading ? 'opacity-75 cursor-not-allowed' : ''
           }`}
+          aria-label="Login"
         >
           {isLoading ? (
             <>
               <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
-              Masuk...
+              Login...
             </>
           ) : (
-            'Masuk ke Dashboard'
+            'Login'
           )}
         </button>
       </form>

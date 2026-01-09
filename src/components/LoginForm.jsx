@@ -86,7 +86,7 @@ const LoginForm = ({ onLoginSuccess }) => {
               value={formData.email}
               onChange={handleInputChange}
               className="block w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent transition-all duration-300 bg-white shadow-soft"
-              placeholder="admin@kemakom.ugm.ac.id"
+              placeholder="admin@kemakom.org"
             />
           </div>
         </div>

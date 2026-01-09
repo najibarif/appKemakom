@@ -10,6 +10,7 @@ import AngkatanPage from './pages/AngkatanPage';
 import SejarahPage from './pages/SejarahPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
+import UserProfilePage from './pages/UserProfilePage';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
@@ -34,17 +35,43 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
   const [currentPage, setCurrentPage] = useState('home');
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     // Check authentication status when component mounts
-    setLoading(false);
-  }, []);
+    const loadUserProfile = async () => {
+      if (authService.isAuthenticated()) {
+        try {
+          const profile = await authService.getProfile();
+          setUserProfile(profile);
+        } catch (error) {
+          console.error('Error loading user profile:', error);
+        }
+      }
+      setLoading(false);
+    };
+    loadUserProfile();
+
+    // Listen for profile update events
+    const handleProfileUpdate = (event) => {
+      setUserProfile(event.detail);
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+    };
+  }, [isAuthenticated]);
 
   const handleLogin = async (credentials) => {
     try {
       const response = await authService.login(credentials);
       authService.setToken(response.token);
       setIsAuthenticated(true);
+      // Set user profile from login response
+      if (response.user) {
+        setUserProfile(response.user);
+      }
       return { success: true };
     } catch (error) {
       console.error('Login failed:', error);
@@ -56,8 +83,13 @@ function App() {
     try {
       await authService.logout();
       setIsAuthenticated(false);
+      // Redirect to home after logout
+      window.location.href = '/';
     } catch (error) {
       console.error('Logout failed:', error);
+      // Still clear local state even if API call fails
+      setIsAuthenticated(false);
+      window.location.href = '/';
     }
   };
 
@@ -70,15 +102,52 @@ function App() {
             onLogout={handleLogout} 
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
+            userProfile={userProfile}
           />
           <main className="flex-grow pt-20">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/modul" element={<ModulPage />} />
-              <Route path="/alumni" element={<AlumniPage />} />
-              <Route path="/angkatan" element={<AngkatanPage />} />
-              <Route path="/sejarah" element={<SejarahPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route 
+                path="/modul" 
+                element={
+                  <ProtectedRoute>
+                    <ModulPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/alumni" 
+                element={
+                  <ProtectedRoute>
+                    <AlumniPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/angkatan" 
+                element={
+                  <ProtectedRoute>
+                    <AngkatanPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/sejarah" 
+                element={
+                  <ProtectedRoute>
+                    <SejarahPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <UserProfilePage />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/login" 
                 element={
@@ -87,15 +156,6 @@ function App() {
                   ) : (
                     <LoginPage onLogin={handleLogin} />
                   )
-                } 
-              />
-              {/* Add more protected routes as needed */}
-              <Route 
-                path="/admin/*" 
-                element={
-                  <ProtectedRoute>
-                    {/* Your admin routes/components */}
-                  </ProtectedRoute>
                 } 
               />
             </Routes>

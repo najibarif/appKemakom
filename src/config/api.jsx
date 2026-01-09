@@ -21,6 +21,26 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  // Don't set Content-Type for FormData, let browser set it with boundary
+  if (config.data instanceof FormData) {
+    // Remove Content-Type header completely for FormData
+    delete config.headers['Content-Type'];
+    // Log FormData contents for debugging
+    console.log('Sending FormData:', {
+      hasProfileImage: config.data.has('profile_image'),
+      hasName: config.data.has('name'),
+      entries: Array.from(config.data.entries()).map(([key, value]) => ({
+        key,
+        value: value instanceof File ? {
+          name: value.name,
+          size: value.size,
+          type: value.type
+        } : value
+      }))
+    });
+  }
+  
   return config;
 });
 

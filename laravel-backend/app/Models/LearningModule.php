@@ -5,23 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Modul extends Model
+class LearningModule extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'title',
         'description',
-        'category',
-        'downloads',
-        'views',
-        'date',
-        'file'
+        'content',
+        'simulation_code',
+        'quiz',
+        'duration',
+        'order',
+        'is_active',
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'quiz' => 'array',
+        'is_active' => 'boolean',
+        'order' => 'integer',
     ];
 }

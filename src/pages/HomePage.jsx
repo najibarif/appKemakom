@@ -1,6 +1,5 @@
 import Hero from '../components/Hero';
 import Features from '../components/Features';
-import LatestNews from '../components/LatestNews';
 import SejarahOrganisasi from '../components/SejarahOrganisasi';
 
 const HomePage = () => {
@@ -8,7 +7,6 @@ const HomePage = () => {
     <div>
       <Hero />
       <Features />
-      <LatestNews />
       <SejarahOrganisasi />
     </div>
   );

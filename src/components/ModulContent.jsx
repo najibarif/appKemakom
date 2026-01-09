@@ -312,11 +312,157 @@ const ModulContent = ({
       <div className="flex-1 overflow-y-auto bg-gray-50">
         <div className="max-w-4xl mx-auto p-4 md:p-8">
           {activeTab === 'content' && (
-            <div className="bg-white rounded-lg shadow-sm p-8">
-              <div className="prose prose-lg max-w-none">
-                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                  {moduleData.content}
-                </ReactMarkdown>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-6 py-8 md:px-10 md:py-12 max-w-4xl mx-auto">
+                <style>{`
+                  .module-content h1 {
+                    font-size: 2.25rem;
+                    font-weight: 700;
+                    color: #0F4639;
+                    margin-top: 2rem;
+                    margin-bottom: 1.5rem;
+                    padding-bottom: 1rem;
+                    border-bottom: 2px solid #e5e7eb;
+                    line-height: 1.2;
+                  }
+                  .module-content h2 {
+                    font-size: 1.875rem;
+                    font-weight: 600;
+                    color: #0F4639;
+                    margin-top: 2.5rem;
+                    margin-bottom: 1.25rem;
+                    line-height: 1.3;
+                  }
+                  .module-content h3 {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    color: #0F4639;
+                    margin-top: 2rem;
+                    margin-bottom: 1rem;
+                    line-height: 1.4;
+                  }
+                  .module-content h4 {
+                    font-size: 1.25rem;
+                    font-weight: 600;
+                    color: #0F4639;
+                    margin-top: 1.5rem;
+                    margin-bottom: 0.75rem;
+                    line-height: 1.4;
+                  }
+                  .module-content p {
+                    color: #374151;
+                    line-height: 1.75;
+                    margin-bottom: 1.5rem;
+                    font-size: 1.0625rem;
+                    text-align: justify;
+                  }
+                  .module-content ul, .module-content ol {
+                    margin-top: 1.5rem;
+                    margin-bottom: 1.5rem;
+                    padding-left: 1.75rem;
+                  }
+                  .module-content li {
+                    color: #374151;
+                    line-height: 1.75;
+                    margin-bottom: 0.75rem;
+                    font-size: 1.0625rem;
+                  }
+                  .module-content ul li {
+                    list-style-type: disc;
+                  }
+                  .module-content ol li {
+                    list-style-type: decimal;
+                  }
+                  .module-content strong {
+                    color: #111827;
+                    font-weight: 600;
+                  }
+                  .module-content code {
+                    background-color: #f3f4f6;
+                    color: #0F4639;
+                    padding: 0.25rem 0.5rem;
+                    border-radius: 0.375rem;
+                    font-size: 0.875rem;
+                    font-family: 'Monaco', 'Courier New', monospace;
+                    font-weight: 500;
+                  }
+                  .module-content pre {
+                    background-color: #1f2937;
+                    color: #f9fafb;
+                    border-radius: 0.5rem;
+                    padding: 1.25rem;
+                    overflow-x: auto;
+                    margin: 1.5rem 0;
+                    line-height: 1.6;
+                  }
+                  .module-content pre code {
+                    background-color: transparent;
+                    color: #f9fafb;
+                    padding: 0;
+                    font-size: 0.875rem;
+                  }
+                  .module-content blockquote {
+                    border-left: 4px solid #A6B933;
+                    padding-left: 1.5rem;
+                    font-style: italic;
+                    color: #4b5563;
+                    margin: 1.5rem 0;
+                  }
+                  .module-content a {
+                    color: #0F4639;
+                    font-weight: 500;
+                    text-decoration: underline;
+                    text-decoration-thickness: 2px;
+                    text-underline-offset: 2px;
+                    transition: color 0.2s;
+                  }
+                  .module-content a:hover {
+                    color: #A6B933;
+                  }
+                  .module-content img {
+                    border-radius: 0.5rem;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    margin: 1.5rem auto;
+                    max-width: 100%;
+                    height: auto;
+                  }
+                  .module-content hr {
+                    margin: 2rem 0;
+                    border: none;
+                    border-top: 1px solid #e5e7eb;
+                  }
+                  .module-content table {
+                    width: 100%;
+                    margin: 1.5rem 0;
+                    border-collapse: collapse;
+                  }
+                  .module-content th {
+                    background-color: #f3f4f6;
+                    color: #111827;
+                    font-weight: 600;
+                    padding: 0.75rem;
+                    border: 1px solid #d1d5db;
+                    text-align: left;
+                  }
+                  .module-content td {
+                    padding: 0.75rem;
+                    border: 1px solid #d1d5db;
+                    color: #374151;
+                  }
+                  .module-content ::selection {
+                    background-color: #A6B933;
+                    color: white;
+                  }
+                `}</style>
+                <div className="module-content">
+                  {typeof moduleData.content === 'string' ? (
+                    <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                      {moduleData.content}
+                    </ReactMarkdown>
+                  ) : (
+                    <div className="text-gray-700 leading-relaxed text-lg">{moduleData.content}</div>
+                  )}
+                </div>
               </div>
             </div>
           )}

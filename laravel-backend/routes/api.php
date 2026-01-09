@@ -6,9 +6,10 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AlumniController;
 use App\Http\Controllers\Api\AngkatanController;
 use App\Http\Controllers\Api\NewsController;
-use App\Http\Controllers\Api\ModulController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\TimelineController;
+use App\Http\Controllers\Api\ModuleProgressController;
+use App\Http\Controllers\Api\LearningModuleController;
 
 // Public routes
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -17,20 +18,26 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::get('/alumni', [AlumniController::class, 'index']);
 Route::get('/angkatan', [AngkatanController::class, 'index']);
 Route::get('/news', [NewsController::class, 'index']);
-Route::get('/moduls', [ModulController::class, 'index']);
+Route::get('/learning-modules', [LearningModuleController::class, 'index']);
 Route::get('/contacts', [ContactController::class, 'index']);
 Route::get('/timeline', [TimelineController::class, 'index']);
 
 // Increment counters (public)
 Route::post('/news/{news}/view', [NewsController::class, 'incrementViews']);
-Route::post('/moduls/{modul}/download', [ModulController::class, 'incrementDownloads']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/profile', [AuthController::class, 'profile']);
+    Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/auth/profile', [AuthController::class, 'updateProfile']); // Alternative for FormData
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+    
+    // Module Progress routes
+    Route::get('/module-progress', [ModuleProgressController::class, 'index']);
+    Route::put('/module-progress', [ModuleProgressController::class, 'update']);
+    Route::put('/module-progress/{moduleId}', [ModuleProgressController::class, 'updateModule']);
     
     // Alumni management
     Route::get('/alumni/{alumni}', [AlumniController::class, 'show']);
@@ -50,11 +57,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/news/{news}', [NewsController::class, 'update']);
     Route::delete('/news/{news}', [NewsController::class, 'destroy']);
     
-    // Modul management
-    Route::get('/moduls/{modul}', [ModulController::class, 'show']);
-    Route::post('/moduls', [ModulController::class, 'store']);
-    Route::put('/moduls/{modul}', [ModulController::class, 'update']);
-    Route::delete('/moduls/{modul}', [ModulController::class, 'destroy']);
+    // Learning Module management
+    Route::get('/learning-modules/{learningModule}', [LearningModuleController::class, 'show']);
+    Route::post('/learning-modules', [LearningModuleController::class, 'store']);
+    Route::put('/learning-modules/{learningModule}', [LearningModuleController::class, 'update']);
+    Route::delete('/learning-modules/{learningModule}', [LearningModuleController::class, 'destroy']);
     
     // Contact management
     Route::get('/contacts/{contact}', [ContactController::class, 'show']);

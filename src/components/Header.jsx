@@ -1,11 +1,12 @@
 import React from 'react';
 import { GraduationCap, Menu, X, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-const Header = ({ isLoggedIn, onLogout }) => {
+const Header = ({ isAuthenticated, onLogout, userProfile }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navigation = [
     { name: 'Beranda', href: '/' },
@@ -52,24 +53,42 @@ const Header = ({ isLoggedIn, onLogout }) => {
           </nav>
 
           {/* Auth Section */}
-          <div className="flex items-center gap-4">
-            {isLoggedIn ? (
-              <div className="flex items-center gap-3">
-                <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[#0F4639]/5 to-[#A6B933]/5 rounded-lg">
-                  <User className="w-4 h-4 text-[#0F4639]" />
-                </div>
+          <div className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <>
+                {/* User Icon - Shows logged in status, clickable to go to profile */}
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-[#0F4639] to-[#A6B933] rounded-full shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group relative overflow-hidden"
+                  title="Profil Saya"
+                >
+                  {userProfile?.profile_image ? (
+                    <img
+                      src={userProfile.profile_image}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-5 h-5 text-white" />
+                  )}
+                  <span className="absolute opacity-0 group-hover:opacity-100 bg-gray-900 text-white text-xs px-2 py-1 rounded mt-12 pointer-events-none transition-opacity duration-300 whitespace-nowrap z-50">
+                    Profil Saya
+                  </span>
+                </button>
+                
+                {/* Logout Button */}
                 <button
                   onClick={onLogout}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-300"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-300 shadow-sm hover:shadow-md"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline">Logout</span>
+                  <span className="hidden sm:inline font-medium">Logout</span>
                 </button>
-              </div>
+              </>
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-[#0F4639] to-[#A6B933] text-white rounded-lg hover:from-[#0F4639]/90 hover:to-[#A6B933]/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-[#0F4639] to-[#A6B933] text-white rounded-lg hover:from-[#0F4639]/90 hover:to-[#A6B933]/90 transition-all duration-300 shadow-lg hover:shadow-xl font-medium"
               >
                 <User className="w-4 h-4" />
                 <span>Login</span>
